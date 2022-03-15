@@ -1,7 +1,9 @@
 #include <stdio.h>
-#include <string.h>
-#include "lib/cJSON/cJSON.h"
 #include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+#include "lib/cJSON/cJSON.h"
+#include "lib/utils/http.h"
 
 
 void parseJsonFile(const char *filename, cJSON **json)
@@ -50,13 +52,16 @@ int getMinecraftVersion(cJSON **versionManifest, const char * version, char ** U
 	return status;
 }
 
+
 int main()
 {
+	CURL *session = curl_easy_init();
   cJSON *versionManifest = NULL;
-  parseJsonFile("version_manifest_v2.json", &versionManifest);
-
 	char *url, *sha1, *type;
+	Http_Download("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json", "version_manifest_v2.json", session);
+  parseJsonFile("version_manifest_v2.json", &versionManifest);
   getMinecraftVersion(&versionManifest,"1.18.2", &url, &sha1, &type);
-
+	printf("%s\n%s\n%s", type, sha1, url);
+	Http_Download(url,"1.18.2.json", session);
 	return 0;
 }
