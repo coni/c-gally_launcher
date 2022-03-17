@@ -1,6 +1,6 @@
-#include <curl/curl.h>
 #include <stddef.h>
-
+#include <curl/curl.h>
+#include "system.h"
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -18,6 +18,7 @@ int Http_Download(const char * url, const char * filename, CURL **session)
   curl_easy_setopt(session, CURLOPT_NOPROGRESS, 1L);
   curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, write_data);
  
+  _mkdir(filename);
   pagefile = fopen(filename, "wb");
   if(pagefile) {
     curl_easy_setopt(session, CURLOPT_WRITEDATA, pagefile);
@@ -30,3 +31,4 @@ int Http_Download(const char * url, const char * filename, CURL **session)
   curl_global_cleanup();
 	return http_code;
 }
+// TODO : POST & GET request

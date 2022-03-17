@@ -1,6 +1,6 @@
 MAINFILE = main.c
 CFLAG = -lcurl
-LIB = lib/cJSON/cJSON.c lib/utils/http.c
+LIB = lib/cJSON/cJSON.c lib/utils/http.c lib/utils/system.c
 OUTPUT = bin/out
 
 all:
