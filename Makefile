@@ -12,3 +12,4 @@ run:
 
 all:
 	gcc $(LIB) $(MAINFILE) $(CFLAG) -o $(OUTPUT)
+
