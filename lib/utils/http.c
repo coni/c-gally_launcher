@@ -7,7 +7,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
   return written;
 }
 
-int Http_Download(const char * url, const char * filename, CURL **session)
+int Http_Download(const char * url, const char * filename, CURL **session, int compare)
 {
   // Source : https://curl.se/libcurl/c/url2file.html
   FILE *pagefile;
@@ -23,6 +23,7 @@ int Http_Download(const char * url, const char * filename, CURL **session)
   if(pagefile) {
     curl_easy_setopt(session, CURLOPT_WRITEDATA, pagefile);
     curl_easy_perform(session);
+    double dl;
     fclose(pagefile);
   }
 	curl_easy_getinfo (session, CURLINFO_RESPONSE_CODE, &http_code); 

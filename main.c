@@ -9,6 +9,7 @@
 #include "lib/utils/system.h"
 #include "lib/minecraft/versionsManifest.h"
 #include "lib/minecraft/mainclass.h"
+#include "lib/minecraft/client.h"
 
 int main()
 {
@@ -19,7 +20,6 @@ int main()
 	char *rootAssets = malloc((strlen(root) + 8)*sizeof(char*));
 	char *rootLibraries = malloc((strlen(root) + 10)*sizeof(char*));
 
-	a = 27270;
 	strcpy(rootVersion, root);
 	strcpy(rootAssets, root);
 	strcpy(rootLibraries, root);
@@ -40,17 +40,27 @@ int main()
   parseJsonFile(temp, &versionsManifest);
   getMinecraftVersion(&versionsManifest, version, &url, &sha1, &type);
 
-	temp = malloc((strlen(rootVersion) + strlen(version) + strlen(version) + 7) * sizeof(char *));
-	strcpy(temp, rootVersion);
-	strcat(temp, version);
-	strcat(temp, "/");
-	strcat(temp, version);
-	strcat(temp, ".json");
-	Http_Download(url, temp, session);
+	// json path.
+	temp = "/home/coni/.minecraft/versions/fabric-loader-0.13.3-1.18.2/fabric-loader-0.13.3-1.18.2.json";
+	/* temp = malloc((strlen(rootVersion) + strlen(version) + strlen(version) + 7) * sizeof(char *)); */
+	/* strcpy(temp, rootVersion); */
+	/* strcat(temp, version); */
+	/* strcat(temp, "/"); */
+	/* strcat(temp, version); */
+	/* strcat(temp, ".json"); */
+	/* Http_Download(url, temp, session); */
   parseJsonFile(temp, &versionManifest);
 
 	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
-	char *mainclass = getMainclass(versionManifest);
+	printf(classpath);
+	/* char *mainclass = getMainclass(versionManifest); */
+	/* char *mainJar =	downloadMainJar(versionManifest, rootVersion, session); */
+	/* if (strcmp(mainJar, "") != 0) */
+	/* { */
+	/* 	classpath = realloc(classpath, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*)); */
+	/* 	strcat(classpath,":"); */
+	/* 	strcat(classpath, mainJar); */
+	/* } */
 
 	return 0;
 }
