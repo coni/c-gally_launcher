@@ -13,8 +13,8 @@
 
 int main()
 {
-	int a = 0;
-	char *version = "1.18.2";
+	// init variable
+	char *version = "fabric-loader-0.13.3-1.18.2";
 	char *root = "/home/coni/.minecraft/";
 	char *rootVersion = malloc((strlen(root) + 10)*sizeof(char*));
 	char *rootAssets = malloc((strlen(root) + 8)*sizeof(char*));
@@ -33,34 +33,35 @@ int main()
 	char *url, *sha1, *type = NULL;
 	char *temp = NULL;
 
+	// Version Manifest
 	temp = malloc((strlen(rootVersion) + strlen("version_manifest_v2.json") + 1) * sizeof(char *));
 	strcpy(temp, rootVersion);
 	strcat(temp, "version_manifest_v2.json");
 	Http_Download("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json", temp, session);
   parseJsonFile(temp, &versionsManifest);
-  getMinecraftVersion(&versionsManifest, version, &url, &sha1, &type);
 
-	// json path.
-	temp = "/home/coni/.minecraft/versions/fabric-loader-0.13.3-1.18.2/fabric-loader-0.13.3-1.18.2.json";
-	/* temp = malloc((strlen(rootVersion) + strlen(version) + strlen(version) + 7) * sizeof(char *)); */
-	/* strcpy(temp, rootVersion); */
-	/* strcat(temp, version); */
-	/* strcat(temp, "/"); */
-	/* strcat(temp, version); */
-	/* strcat(temp, ".json"); */
-	/* Http_Download(url, temp, session); */
+	// Download version json from the version manifest
+	temp = malloc((strlen(rootVersion) + strlen(version) + strlen(version) + 7) * sizeof(char *));
+	strcpy(temp, rootVersion);
+	strcat(temp, version);
+	strcat(temp, "/");
+	strcat(temp, version);
+	strcat(temp, ".json");
+  downloadMinecraftVersion(&versionsManifest, version, temp, session);
+
+	// Getting Classpath from the json version
   parseJsonFile(temp, &versionManifest);
-
 	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
-	printf(classpath);
-	/* char *mainclass = getMainclass(versionManifest); */
-	/* char *mainJar =	downloadMainJar(versionManifest, rootVersion, session); */
-	/* if (strcmp(mainJar, "") != 0) */
-	/* { */
-	/* 	classpath = realloc(classpath, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*)); */
-	/* 	strcat(classpath,":"); */
-	/* 	strcat(classpath, mainJar); */
-	/* } */
+	char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session);
+	if (strcmp(mainJar, "") != 0)
+	{
+		classpath = realloc(classpath, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
+		strcat(classpath,":");
+		strcat(classpath, mainJar);
+	}
 
+	// Getting Mainclass
+	char *mainclass = getMainclass(versionManifest);
+	
 	return 0;
 }

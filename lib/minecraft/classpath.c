@@ -19,6 +19,7 @@ int compareLwjglVersion(const char * new, const char * old)
 		return 1;
 	}
 }
+
 char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **session)
 {
 	char *classpath = malloc(sizeof(char *));
@@ -41,6 +42,8 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 			char splittedLibName[strlen(libName->valuestring)];
 			strcpy(splittedLibName, libName->valuestring);
 			char *splittedLibNameElt = strtok(splittedLibName, ":");
+			char *libNameFormatted = malloc(sizeof(char *));
+			strcpy(libNameFormatted, "");
 
 			char *fullpath = malloc(strlen(path) + 1);
 			char *org = NULL;
@@ -59,27 +62,31 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 			version = malloc(sizeof(char *) * strlen(splittedLibNameElt));
 			strcpy(version, splittedLibNameElt);
 
-			char *splitOrg = strtok(org, ".");	
-			fullpath = realloc(fullpath, sizeof(char *) * (strlen(path) + strlen(org) + (strlen(name) + strlen(version)) * 2) + 8);
-			strcpy(fullpath, path);
-			
+			char *splitOrg = strtok(org, ".");
+			libNameFormatted = malloc(sizeof (char *) * ((strlen(name) + strlen(version))* 2 + 8));
+			strcpy(libNameFormatted, "");
+
 			while (splitOrg)
 			{
-				strcat(fullpath, splitOrg);
-				strcat(fullpath, "/");
+				strcat(libNameFormatted, splitOrg);
+				strcat(libNameFormatted, "/");
 				if (strcmp(splitOrg, "lwjgl") == 0)
 					isLwjgl = 1;
 				splitOrg = strtok(NULL, ".");
 			}
 
-			strcat(fullpath, name);
-			strcat(fullpath, "/");
-			strcat(fullpath, version);
-			strcat(fullpath, "/");
-			strcat(fullpath, name);
-			strcat(fullpath, "-");
-			strcat(fullpath, version);
-			strcat(fullpath, ".jar");
+			strcat(libNameFormatted, name);
+			strcat(libNameFormatted, "/");
+			strcat(libNameFormatted, version);
+			strcat(libNameFormatted, "/");
+			strcat(libNameFormatted, name);
+			strcat(libNameFormatted, "-");
+			strcat(libNameFormatted, version);
+			strcat(libNameFormatted, ".jar");
+			
+			fullpath = realloc(fullpath, sizeof(char *) * (strlen(path) + strlen(libNameFormatted)));
+			strcpy(fullpath, path);
+			strcat(fullpath, libNameFormatted);
 			
 			if (isLwjgl)
 			{
@@ -104,6 +111,7 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 				strcat(classpath, fullpath);
 				strcat(classpath, ":");
 			}
+					printf("%s\n", fullpath);
 				// Download Librarie
 			cJSON *libDlInfo = cJSON_GetObjectItemCaseSensitive(lib, "downloads");
 			if (libDlInfo)
@@ -118,9 +126,21 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 					
 					Http_Download(libUrl->valuestring, fullpath, session);
 				}
+			} else
+			{
+				libDlInfo = cJSON_GetObjectItemCaseSensitive(lib, "url");
+				if (libDlInfo)
+				{
+					char *libUrl = malloc(sizeof(char *) * (strlen(libDlInfo->valuestring) + strlen(libNameFormatted) + 1));
+					strcpy(libUrl, libDlInfo->valuestring);
+					strcat(libUrl, libNameFormatted);
+					Http_Download(libDlInfo->valuestring, fullpath, session);	
+				}
 			}
+
 		}
 	}
+
 	if (strcmp(lwjglClasspath, "") != 0)
 	{
 		classpath = realloc(classpath, strlen(classpath) + strlen(lwjglClasspath));

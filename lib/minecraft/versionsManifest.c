@@ -1,6 +1,9 @@
 #include "../cJSON/cJSON.h"
+#include "../utils/http.h"
+#include <curl/curl.h>
 #include <string.h>
-int getMinecraftVersion(cJSON **versionManifest, const char * version, char ** Url, char ** Sha1, char ** Type)
+
+int downloadMinecraftVersion(cJSON **versionManifest, const char * version, char * path, CURL * session)
 {
 	int status = 1;
 	const cJSON *versions = NULL;
@@ -10,13 +13,9 @@ int getMinecraftVersion(cJSON **versionManifest, const char * version, char ** U
 	{
 		cJSON *id = cJSON_GetObjectItemCaseSensitive(versionInfo, "id");
 		cJSON *url = cJSON_GetObjectItemCaseSensitive(versionInfo, "url");
-		cJSON *type = cJSON_GetObjectItemCaseSensitive(versionInfo, "type");
-		cJSON *sha1 = cJSON_GetObjectItemCaseSensitive(versionInfo, "sha1");
 		if (strcmp(id->valuestring,version) == 0)
 		{
-			*Url = url->valuestring;
-			*Sha1 = sha1->valuestring;
-			*Type = type->valuestring;
+			Http_Download(url->valuestring, path, session);
 			status = 0;
 			break;
 		}

@@ -1,3 +1,4 @@
 #include "../cJSON/cJSON.h"
+#include <curl/curl.h>
 
-int getMinecraftVersion(cJSON **versionManifest, const char * version, char ** Url, char ** Sha1, char ** Type);
+int downloadMinecraftVersion(cJSON **versionManifest, const char * version, const char * path, CURL * session);
