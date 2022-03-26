@@ -39,3 +39,12 @@ char * downloadMainJar(cJSON * manifest, const char * versionName, const char * 
 	}
 	return path;
 }
+
+char * getType(cJSON * manifest)
+{
+	char * type = "";
+	cJSON *typeJson= cJSON_GetObjectItemCaseSensitive(manifest, "type");
+	if (typeJson)
+		type = typeJson->valuestring;
+	return type;
+}

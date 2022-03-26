@@ -53,15 +53,14 @@ int main()
   parseJsonFile(temp, &versionManifest);
 	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
 	char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session);
-	if (strcmp(mainJar, "") != 0)
-	{
-		classpath = realloc(classpath, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
-		strcat(classpath,":");
-		strcat(classpath, mainJar);
-	}
+	mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
+	strcat(mainJar,":");
+	strcat(mainJar, classpath);
 
 	// Getting Mainclass
 	char *mainclass = getMainclass(versionManifest);
-	
+
+	// Get Argument
+
 	return 0;
 }
