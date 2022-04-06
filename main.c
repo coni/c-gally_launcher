@@ -14,7 +14,7 @@
 int main()
 {
 	// init variable
-	char *version = "fabric-loader-0.13.3-1.18.2";
+	char *version = "1.15";
 	char *root = "/home/coni/.minecraft/";
 	char *rootVersion = malloc((strlen(root) + 10)*sizeof(char*));
 	char *rootAssets = malloc((strlen(root) + 8)*sizeof(char*));
@@ -61,6 +61,7 @@ int main()
 	char *mainclass = getMainclass(versionManifest);
 
 	// Get Argument
+	printf("%s\n", mainJar);
 
 	return 0;
 }

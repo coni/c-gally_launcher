@@ -5,6 +5,7 @@ OUTPUT = bin/out
 
 debug:
 	gcc $(LIB) -g $(MAINFILE) $(CFLAG) -o $(OUTPUT)
+	./$(OUTPUT)
 
 run:
 	./$(OUTPUT)
