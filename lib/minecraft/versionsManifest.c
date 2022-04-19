@@ -1,6 +1,5 @@
 #include "../cJSON/cJSON.h"
 #include "../utils/http.h"
-#include <curl/curl.h>
 #include <string.h>
 
 int downloadMinecraftVersion(cJSON **versionManifest, const char * version, char * path, CURL * session)
