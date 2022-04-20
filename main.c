@@ -47,6 +47,7 @@ int main(int argc, char * argv[])
 	temp = malloc((strlen(rootVersion) + strlen("version_manifest_v2.json") + 1) * sizeof(char *));
 	strcpy(temp, rootVersion);
 	strcat(temp, "version_manifest_v2.json");
+	printf("Downloading manifest\n");
 	Http_Download("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json", temp, session);
   parseJsonFile(temp, &versionsManifest);
 
@@ -57,6 +58,7 @@ int main(int argc, char * argv[])
 	strcat(temp, "/");
 	strcat(temp, version);
 	strcat(temp, ".json");
+	printf("Downloading %s manifest\n", version);
   downloadMinecraftVersion(&versionsManifest, version, temp, session);
 
 	// Getting Classpath from the json version
@@ -66,9 +68,12 @@ int main(int argc, char * argv[])
 	strcpy(lwjglPath, rootBinary);
 	strcat(lwjglPath, lwjglVersion);
 	strcat(lwjglPath, "/");
+	printf("Downloading LWJGL\n");
 	downloadLwjgl(lwjglVersion, lwjglPath, session);
 
+	printf("Downloading Libraries\n");
 	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
+	printf("Downloading Client\n");
 	char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session);
 	mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
 	strcat(mainJar,":");
@@ -93,6 +98,7 @@ int main(int argc, char * argv[])
 	char runtimePath[strlen(root) + 8];
 	strcpy(runtimePath, root);
 	strcat(runtimePath, "runtime/");
+	printf("Downloading Java Runtime\n");
 	char * javaPath = downloadJre(versionManifest, runtimePath, session);
 	javaPath = realloc(javaPath, (strlen(javaPath) + 10));
 	strcat(javaPath, "bin/java ");
