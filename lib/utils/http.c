@@ -17,13 +17,13 @@ int Http_Download(const char * url, const char * filename, CURL **session, int c
 	curl_easy_setopt(session, CURLOPT_URL, url);
   curl_easy_setopt(session, CURLOPT_NOPROGRESS, 1L);
   curl_easy_setopt(session, CURLOPT_WRITEFUNCTION, write_data);
+  curl_easy_setopt(session, CURLOPT_FOLLOWLOCATION, 1);
  
   _mkdir(filename);
   pagefile = fopen(filename, "wb");
   if(pagefile) {
     curl_easy_setopt(session, CURLOPT_WRITEDATA, pagefile);
     curl_easy_perform(session);
-    double dl;
     fclose(pagefile);
   }
 	curl_easy_getinfo (session, CURLINFO_RESPONSE_CODE, &http_code); 

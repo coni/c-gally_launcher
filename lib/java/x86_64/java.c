@@ -4,9 +4,10 @@
 #include "../../utils/http.h"
 #include "../../utils/json.h"
 
-char OSNAME[] = "linux";
+extern char OSNAME[];
+extern char ARCHITECTURE[];
 
-cJSON * getAllJreManifest(char * path, CURL * session)
+cJSON * getBaseJreManifest(char * path, CURL * session)
 {
   char filename[strlen(path) + 8];
   cJSON * manifest = NULL;
@@ -69,8 +70,8 @@ char * downloadJre(cJSON * manifest, char * path, CURL * session)
   strcat(tempPath, "temp/");
 
   char * component = getJreComponent(manifest);
-  cJSON * jreAllManifest = getAllJreManifest(tempPath, session);
-  cJSON * jreManifest = getJreManifest(jreAllManifest, component, tempPath, session);
+  cJSON * jreBaseManifest = getBaseJreManifest(tempPath, session);
+  cJSON * jreManifest = getJreManifest(jreBaseManifest, component, tempPath, session);
   char * javaPath = malloc((strlen(path) + strlen(component)*2 + strlen(OSNAME) + 4) * sizeof(char *));
   strcpy(javaPath, path);
   strcat(javaPath, component);

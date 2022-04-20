@@ -4,4 +4,4 @@
 char * downloadJre(cJSON * manifest, char * path, CURL * session);
 char * getJreComponent(cJSON * manifest);
 cJSON * getJreManifest(cJSON * manifest, char * component, char * filename, CURL * session);
-cJSON * getAllJreManifest(char * path, CURL * session);
+cJSON * getBaseJreManifest(char * path, CURL * session);

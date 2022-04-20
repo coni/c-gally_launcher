@@ -14,16 +14,17 @@
 #include "lib/minecraft/assets.h"
 #include "lib/utils/string.h"
 #include "lib/java/java.h"
-/* #include "lib/minecraft/lwjgl.h" */
-
+#include "lib/lwjgl/lwjgl.h"
+#include "lib/utils/arch/x64.h"
 
 int main(int argc, char * argv[])
 {
 	// init variable
-	char *version = argv[1];
-	printf("%s -> ", version);
+	char *version = "1.18.2";
+	/* printf("%s -> ", version); */
 
 	char *root = "/home/coni/.minecraft/";
+	char *rootBinary = malloc((strlen(root) + 5)*sizeof(char *));
 	char *rootVersion = malloc((strlen(root) + 10)*sizeof(char*));
 	char *rootAssets = malloc((strlen(root) + 8)*sizeof(char*));
 	char *rootLibraries = malloc((strlen(root) + 10)*sizeof(char*));
@@ -31,6 +32,8 @@ int main(int argc, char * argv[])
 	strcpy(rootVersion, root);
 	strcpy(rootAssets, root);
 	strcpy(rootLibraries, root);
+	strcpy(rootBinary, root);
+	strcat(rootBinary, "bin/");
 	strcat(rootVersion, "versions/");
 	strcat(rootAssets, "assets/");
 	strcat(rootLibraries, "libraries/");
@@ -58,46 +61,51 @@ int main(int argc, char * argv[])
 
 	// Getting Classpath from the json version
   parseJsonFile(temp, &versionManifest);
-	printf("%s\n",getLwjglVersion(versionManifest));
-	/* char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session); */
-	/* char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session); */
-	/* mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*)); */
-	/* strcat(mainJar,":"); */
-	/* strcat(mainJar, classpath); */
-	/* free(classpath); */
-	/* classpath = mainJar; */
+	char * lwjglVersion = getLwjglVersion(versionManifest);
+	char * lwjglPath = malloc((strlen(rootBinary) + strlen(lwjglVersion) + 2)*sizeof(char*));
+	strcpy(lwjglPath, rootBinary);
+	strcat(lwjglPath, lwjglVersion);
+	strcat(lwjglPath, "/");
+	downloadLwjgl(lwjglVersion, lwjglPath, session);
+
+	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
+	char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session);
+	mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
+	strcat(mainJar,":");
+	strcat(mainJar, classpath);
+	free(classpath);
+	classpath = mainJar;
 
 	// Getting Mainclass
-	/* char *mainclass = getMainclass(versionManifest); */
+	char *mainclass = getMainclass(versionManifest);
 
 	// Get Argument
-	/* jvmARGS jvmArgs = initJvmArgs(); */
-	/* jvmArgs.classpath = classpath; */
-	/* jvmArgs.natives_directory = "/home/coni/.minecraft/bin/3.2.2/"; */
+	jvmARGS jvmArgs = initJvmArgs();
+	jvmArgs.classpath = classpath;
+	jvmArgs.natives_directory = "/home/coni/.minecraft/bin/3.2.2/";
 
-	/* gameARGS gameArgs = initGameArgs(); */
-	/* gameArgs.version_name = version; */
-	/* gameArgs.assets_index_name = getAssetIndex(versionManifest); */
+	gameARGS gameArgs = initGameArgs();
+	gameArgs.version_name = version;
+	gameArgs.assets_index_name = getAssetIndex(versionManifest);
 
-	/* char * gameArguments = getGameArguments(versionManifest, gameArgs); */
-	/* char * javaArguments = getJavaArguments(versionManifest, jvmArgs); */
-	/* char runtimePath[strlen(root) + 8]; */
-	/* strcpy(runtimePath, root); */
-	/* strcat(runtimePath, "runtime/"); */
-	/* char * javaPath = downloadJre(versionManifest, runtimePath, session); */
-	/* javaPath = realloc(javaPath, (strlen(javaPath) + 10)); */
-	/* strcat(javaPath, "bin/java "); */
-	/* printf("%s\n", javaPath); */
+	char * gameArguments = getGameArguments(versionManifest, gameArgs);
+	char * javaArguments = getJavaArguments(versionManifest, jvmArgs);
+	char runtimePath[strlen(root) + 8];
+	strcpy(runtimePath, root);
+	strcat(runtimePath, "runtime/");
+	char * javaPath = downloadJre(versionManifest, runtimePath, session);
+	javaPath = realloc(javaPath, (strlen(javaPath) + 10));
+	strcat(javaPath, "bin/java ");
 	
 		// Create Launch Command
-	/* char * launchCommand = malloc(sizeof(char*) * (strlen(javaPath)  + strlen(javaArguments) + strlen(mainclass) + 1 + strlen(gameArguments) + 1)); */
-	/* strcpy(launchCommand, javaPath); */
-	/* strcat(launchCommand, javaArguments); */
-	/* strcat(launchCommand, mainclass); */
-	/* strcat(launchCommand, " "); */
-	/* strcat(launchCommand, gameArguments); */
+	char * launchCommand = malloc(sizeof(char*) * (strlen(javaPath)  + strlen(javaArguments) + strlen(mainclass) + 1 + strlen(gameArguments) + 1));
+	strcpy(launchCommand, javaPath);
+	strcat(launchCommand, javaArguments);
+	strcat(launchCommand, mainclass);
+	strcat(launchCommand, " ");
+	strcat(launchCommand, gameArguments);
 
-	/* printf("%s\n", launchCommand); */
+	printf("%s\n", launchCommand);
 
 	return 0;
 }

@@ -43,6 +43,9 @@ char * getLwjglVersion(cJSON *manifest)
 			strcpy(name, splittedLibNameElt);
 			splittedLibNameElt =  strtok(NULL,":");
 			
+			version = malloc(sizeof(char *) * strlen(splittedLibNameElt));
+			strcpy(version, splittedLibNameElt);
+			
 			char *splitOrg = strtok(org, ".");
 			char *libNameFormatted = malloc(sizeof (char *) * ((strlen(name) + strlen(version))* 2 + 8));
 			strcpy(libNameFormatted, "");
@@ -178,7 +181,7 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 					cJSON *libPath = cJSON_GetObjectItemCaseSensitive(libDlInfo, "path");
 					cJSON *libSize = cJSON_GetObjectItemCaseSensitive(libDlInfo, "size");
 					
-					/* Http_Download(libUrl->valuestring, fullpath, session); */
+					Http_Download(libUrl->valuestring, fullpath, session);
 				}
 			} else
 			{
@@ -188,7 +191,7 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 					char *libUrl = malloc(sizeof(char *) * (strlen(libDlInfo->valuestring) + strlen(libNameFormatted) + 1));
 					strcpy(libUrl, libDlInfo->valuestring);
 					strcat(libUrl, libNameFormatted);
-					/* Http_Download(libDlInfo->valuestring, fullpath, session); */	
+					Http_Download(libDlInfo->valuestring, fullpath, session);	
 				}
 			}
 
@@ -200,6 +203,5 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 		classpath = realloc(classpath, strlen(classpath) + strlen(lwjglClasspath));
 		strcat(classpath, lwjglClasspath);
 	}
-	printf("%s\n", lwjglVersion);
 	return classpath;
 }
