@@ -31,6 +31,7 @@ gameARGS initGameArgs()
 	args.version_type = "release";
 	args.resolution_width = "NULL";
 	args.resolution_height = "NULL";
+	args.user_properties = "{}";
 	return args;
 }
 
@@ -124,6 +125,8 @@ char * getGameArguments(cJSON * manifest, gameARGS args)
 			i = gameArgJson;
 			if (strstr(i->valuestring, "${auth_player_name}"))
 				i->valuestring = str_replace(i->valuestring, "${auth_player_name}", args.auth_player_name);
+			if (strstr(i->valuestring, "${user_properties}"))
+				i->valuestring = str_replace(i->valuestring, "${user_properties}", args.user_properties);
 			if (strstr(i->valuestring, "${version_name}"))
 				i->valuestring = str_replace(i->valuestring, "${version_name}", args.version_name);
 			if (strstr(i->valuestring, "${game_directory}"))
@@ -143,7 +146,7 @@ char * getGameArguments(cJSON * manifest, gameARGS args)
 			if (strstr(i->valuestring, "${auth_xuid}"))
 				i->valuestring = str_replace(i->valuestring, "${auth_xuid}", args.auth_xuid);
 			if (strstr(i->valuestring, "${user_type}"))
-				i->valuestring = str_replace(i->valuestring, "${user_typer}", args.user_type);
+				i->valuestring = str_replace(i->valuestring, "${user_type}", args.user_type);
 			if (strstr(i->valuestring, "${version_type}"))
 				i->valuestring = str_replace(i->valuestring, "${version_type}", args.version_type);
 			gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(i->valuestring)+1));
@@ -205,6 +208,14 @@ char * getJavaArguments(cJSON * manifest, jvmARGS args)
 				}			
 			}
 		}
+	}
+	else
+	{
+		javaArguments = realloc(javaArguments, (strlen(args.classpath) + strlen(args.natives_directory) + 25) * sizeof(char*));
+		strcat(javaArguments, "-Djava.library.path=");
+		strcat(javaArguments, args.natives_directory);
+		strcat(javaArguments, " -cp ");
+		strcat(javaArguments, args.classpath);
 	}
 	return javaArguments;
 }

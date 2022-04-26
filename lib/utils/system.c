@@ -1,6 +1,12 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+void system_exec(const char *command)
+{
+    system(command);
+}
 
 void _mkdir(const char *dir) {
     char tmp[256];
@@ -20,3 +26,12 @@ void _mkdir(const char *dir) {
     }
     mkdir(tmp, S_IRWXU);
 }
+
+void system_makeExec(const char *file)
+{
+    char command[strlen(file) + 10];
+    strcpy(command, "chmod +x ");
+    strcat(command, file);
+    system_exec(command);
+}
+

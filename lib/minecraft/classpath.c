@@ -75,6 +75,8 @@ char * getLwjglVersion(cJSON *manifest)
 			}
 		}
 	}
+	if (strcmp(lwjglVersion, "2.9.4") == 0)
+		lwjglVersion = "2.9.2";
 	return lwjglVersion;
 }
 

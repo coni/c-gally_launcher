@@ -105,8 +105,11 @@ char * downloadJre(cJSON * manifest, char * path, CURL * session)
           if (strcmp(type->valuestring, "file") == 0)
           {
             Http_Download(url->valuestring, fullpath, session);
-            /* if (strcmp(executable, "True") == 0) */
-            /*   // TO-DO */
+            if (executable)
+            {
+                if (executable->valueint == 1)
+                  system_makeExec(fullpath);
+            }
           }
           else if (strcmp(type->valuestring, "directory") == 0)
             _mkdir(fullpath);

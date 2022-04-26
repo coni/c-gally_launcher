@@ -16,11 +16,12 @@
 #include "lib/java/java.h"
 #include "lib/lwjgl/lwjgl.h"
 #include "lib/utils/arch/x64.h"
+#include <unistd.h>
 
 int main(int argc, char * argv[])
 {
 	// init variable
-	char *version = "1.18.2";
+	char *version = "1.0";
 	/* printf("%s -> ", version); */
 
 	char *root = "/home/coni/.minecraft/";
@@ -60,9 +61,12 @@ int main(int argc, char * argv[])
 	strcat(temp, ".json");
 	printf("Downloading %s manifest\n", version);
   downloadMinecraftVersion(&versionsManifest, version, temp, session);
+	parseJsonFile(temp, &versionManifest);
+
+	// download assets
+	downloadAssets(versionManifest, rootAssets, session);
 
 	// Getting Classpath from the json version
-  parseJsonFile(temp, &versionManifest);
 	char * lwjglVersion = getLwjglVersion(versionManifest);
 	char * lwjglPath = malloc((strlen(rootBinary) + strlen(lwjglVersion) + 2)*sizeof(char*));
 	strcpy(lwjglPath, rootBinary);
@@ -87,7 +91,7 @@ int main(int argc, char * argv[])
 	// Get Argument
 	jvmARGS jvmArgs = initJvmArgs();
 	jvmArgs.classpath = classpath;
-	jvmArgs.natives_directory = "/home/coni/.minecraft/bin/3.2.2/";
+	jvmArgs.natives_directory = "/home/coni/.minecraft/bin/2.9.2/";
 
 	gameARGS gameArgs = initGameArgs();
 	gameArgs.version_name = version;
@@ -107,11 +111,15 @@ int main(int argc, char * argv[])
 	char * launchCommand = malloc(sizeof(char*) * (strlen(javaPath)  + strlen(javaArguments) + strlen(mainclass) + 1 + strlen(gameArguments) + 1));
 	strcpy(launchCommand, javaPath);
 	strcat(launchCommand, javaArguments);
+	strcat(launchCommand, " ");
 	strcat(launchCommand, mainclass);
 	strcat(launchCommand, " ");
 	strcat(launchCommand, gameArguments);
 
-	printf("%s\n", launchCommand);
-
+	printf("startgingeg eminecraft");
+	chdir(root);
+	system(launchCommand);
+	printf(launchCommand);
 	return 0;
 }
+

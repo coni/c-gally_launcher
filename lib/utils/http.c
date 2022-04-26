@@ -1,5 +1,7 @@
 #include <stddef.h>
 #include <curl/curl.h>
+#include <unistd.h>
+
 #include "system.h"
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -10,6 +12,8 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 int Http_Download(const char * url, const char * filename, CURL **session, int compare)
 {
   // Source : https://curl.se/libcurl/c/url2file.html
+  if(access( filename, F_OK ) == 0)
+    return 1;
   FILE *pagefile;
 	int http_code = 0;
 
