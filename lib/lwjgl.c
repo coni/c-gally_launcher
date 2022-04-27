@@ -1,11 +1,11 @@
-#include "../../cJSON/cJSON.h"
+#include "cJSON/cJSON.h"
 #include <curl/curl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../utils/http.h"
-#include "../../utils/json.h"
-#include "../../utils/system.h"
+#include "utils/http.h"
+#include "utils/json.h"
+#include "utils/system.h"
 
 extern char OSNAME[];
 extern char ARCHITECTURE[];

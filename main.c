@@ -13,16 +13,17 @@
 #include "lib/minecraft/arguments.h"
 #include "lib/minecraft/assets.h"
 #include "lib/utils/string.h"
-#include "lib/java/java.h"
-#include "lib/lwjgl/lwjgl.h"
-#include "lib/utils/arch/x64.h"
+#include "lib/minecraft/java.h"
+#include "lib/lwjgl.h"
 #include <unistd.h>
 #include "lib/utils/argumentsParser.h"
+#include "lib/utils/arch/x64.h"
 
 int main(int argc, char * argv[])
 {
 	// init variable
 	CmdArg args = parse_arguments(argc, argv);
+
 	char *version = args.version;
 	char *root = "/home/coni/.minecraft/";
 	char rootBinary[(strlen(root) + 5)];

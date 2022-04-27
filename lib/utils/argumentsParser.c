@@ -109,6 +109,17 @@ CmdArg parse_arguments(int argc, char * argv[])
           strcpy(currentOption ,"");
           dashc = 0;
         }
+        else
+        {
+          if (i +1 >= argc)
+          {
+            char error_stderr[18 + strlen(currentOption)];
+            strcpy(error_stderr, "invalid option: ");
+            strcat(error_stderr, currentOption);
+            strcat(error_stderr, "\n");
+            system_error(1, error_stderr);
+          }
+        }
       }
       else
       {

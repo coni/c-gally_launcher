@@ -1,8 +1,8 @@
-#include "../../cJSON/cJSON.h"
-#include "../../utils/system.h"
+#include "../cJSON/cJSON.h"
+#include "../utils/system.h"
 #include <stdlib.h>
-#include "../../utils/http.h"
-#include "../../utils/json.h"
+#include "../utils/http.h"
+#include "../utils/json.h"
 
 extern char OSNAME[];
 extern char ARCHITECTURE[];
