@@ -7,7 +7,7 @@
 extern char OSNAME[];
 extern char ARCHITECTURE[];
 
-cJSON * getBaseJreManifest(char * path, CURL * session)
+cJSON * get_base_jre_manifest(char * path, CURL * session)
 {
   char filename[strlen(path) + 8];
   cJSON * manifest = NULL;
@@ -19,14 +19,15 @@ cJSON * getBaseJreManifest(char * path, CURL * session)
   return manifest;
 }
 
-cJSON * getJreManifest(cJSON * manifest, char * component, char * path, CURL * session)
+cJSON * get_jre_manifest(cJSON * manifest, char * component, char * path, CURL * session)
 {
   cJSON * jreManifest = NULL;
   cJSON * i = NULL;
-  path = realloc(path, (strlen(path) + strlen(component) + 6));
   manifest = cJSON_GetObjectItemCaseSensitive(manifest, OSNAME);
-  strcat(path, component);
-  strcat(path, ".json");
+  char * fullpath = malloc((strlen(path) + strlen(component) + 6) * sizeof(char *));
+  strcpy(fullpath, path);
+  strcat(fullpath, component);
+  strcat(fullpath, ".json");
   if (manifest)
   {
     manifest = cJSON_GetObjectItemCaseSensitive(manifest, component);
@@ -38,8 +39,8 @@ cJSON * getJreManifest(cJSON * manifest, char * component, char * path, CURL * s
         if (manifest)
         {
           cJSON * url = cJSON_GetObjectItemCaseSensitive(manifest, "url");
-          http_download(url->valuestring, path, session);
-          jreManifest = json_parse_file(path);
+          http_download(url->valuestring, fullpath, session);
+          jreManifest = json_parse_file(fullpath);
         }
       }
     }
@@ -47,13 +48,12 @@ cJSON * getJreManifest(cJSON * manifest, char * component, char * path, CURL * s
   return jreManifest;
 }
 
-char * getJreComponent(cJSON * manifest)
+char * get_jre_component(cJSON * manifest)
 {
   char * component = NULL;
   cJSON * i = cJSON_GetObjectItemCaseSensitive(manifest, "javaVersion");
   if (i)
   {
-    
     i = cJSON_GetObjectItemCaseSensitive(i, "component");
     if (i)
     {
@@ -69,9 +69,9 @@ char * MinecraftManifest_download_jre(cJSON * manifest, char * path, CURL * sess
   strcpy(tempPath, path);
   strcat(tempPath, "temp/");
 
-  char * component = getJreComponent(manifest);
-  cJSON * jreBaseManifest = getBaseJreManifest(tempPath, session);
-  cJSON * jreManifest = getJreManifest(jreBaseManifest, component, tempPath, session);
+  char * component = get_jre_component(manifest);
+  cJSON * jreBaseManifest = get_base_jre_manifest(path, session);
+  cJSON * jreManifest = get_jre_manifest(jreBaseManifest, component, path, session);
   char * javaPath = malloc((strlen(path) + strlen(component)*2 + strlen(OSNAME) + 4) * sizeof(char *));
   strcpy(javaPath, path);
   strcat(javaPath, component);
