@@ -4,8 +4,8 @@
 #include "../utils/http.h"
 #include "../utils/json.h"
 
-extern char OSNAME[];
-extern char ARCHITECTURE[];
+extern const char OSNAME[256];
+extern const char ARCHITECTURE[256];
 
 cJSON * get_base_jre_manifest(char * path, CURL * session)
 {

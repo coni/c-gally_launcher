@@ -7,8 +7,8 @@
 #include "utils/json.h"
 #include "utils/system.h"
 
-extern char OSNAME[];
-extern char ARCHITECTURE[];
+extern const char OSNAME[256];
+extern const char ARCHITECTURE[256];
 
 cJSON * getBaseLwjglManifest(char * path, CURL * session)
 {
@@ -17,8 +17,7 @@ cJSON * getBaseLwjglManifest(char * path, CURL * session)
   strcpy(filename, path);
   strcat(filename, "lwjgl.json");
   http_download("https://gally-launcher.com/files/lwjgl.json", filename, session);
-  manifest = json_parse_file(filename);
-  return manifest;
+  return json_parse_file(filename);
 }
 
 char * download_lwjgl(char * lwjglVersion, char * path, CURL * session)
@@ -47,7 +46,6 @@ char * download_lwjgl(char * lwjglVersion, char * path, CURL * session)
           char * fullpath = malloc((strlen(lwjglPath) + strlen(filename->valuestring) + 1) * sizeof(char *));
           strcpy(fullpath, lwjglPath);
           strcat(fullpath, filename->valuestring);
-
           http_download(url->valuestring, fullpath, session);
         }
       }

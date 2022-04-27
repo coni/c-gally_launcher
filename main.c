@@ -3,21 +3,21 @@
 #include <string.h>
 #include <curl/curl.h>
 #include "lib/utils/json.h"
-#include "lib/minecraft/classpath.h"
 #include "lib/cJSON/cJSON.h"
 #include "lib/utils/http.h"
 #include "lib/utils/system.h"
-#include "lib/minecraft/versionsManifest.h"
-#include "lib/minecraft/mainclass.h"
-#include "lib/minecraft/client.h"
-#include "lib/minecraft/arguments.h"
-#include "lib/minecraft/assets.h"
 #include "lib/utils/string.h"
-#include "lib/minecraft/java.h"
 #include "lib/lwjgl.h"
 #include <unistd.h>
 #include "lib/utils/argumentsParser.h"
-#include "lib/utils/arch/x64.h"
+
+#include "lib/manifest/versionsManifest.h"
+#include "lib/manifest/classpath.h"
+#include "lib/manifest/mainclass.h"
+#include "lib/manifest/client.h"
+#include "lib/manifest/arguments.h"
+#include "lib/manifest/assets.h"
+#include "lib/manifest/java.h"
 
 int main(int argc, char * argv[])
 {
