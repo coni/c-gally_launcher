@@ -17,13 +17,13 @@
 #include "lib/lwjgl/lwjgl.h"
 #include "lib/utils/arch/x64.h"
 #include <unistd.h>
+#include "lib/utils/argumentsParser.h"
 
 int main(int argc, char * argv[])
 {
 	// init variable
-	char *version = "1.0";
-	/* printf("%s -> ", version); */
-
+	CMD_ARG args = parse_arguments(argc, argv);
+	char *version = args.version;
 	char *root = "/home/coni/.minecraft/";
 	char *rootBinary = malloc((strlen(root) + 5)*sizeof(char *));
 	char *rootVersion = malloc((strlen(root) + 10)*sizeof(char*));
@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
 	// Get Argument
 	jvmARGS jvmArgs = initJvmArgs();
 	jvmArgs.classpath = classpath;
-	jvmArgs.natives_directory = "/home/coni/.minecraft/bin/2.9.2/";
+	jvmArgs.natives_directory = lwjglPath;
 
 	gameARGS gameArgs = initGameArgs();
 	gameArgs.version_name = version;

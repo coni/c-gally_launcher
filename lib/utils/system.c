@@ -35,3 +35,8 @@ void system_makeExec(const char *file)
     system_exec(command);
 }
 
+void system_error(int code, char * string)
+{
+    fprintf(stderr, string);
+    exit(code);
+}
