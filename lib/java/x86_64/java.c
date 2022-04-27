@@ -13,9 +13,9 @@ cJSON * getBaseJreManifest(char * path, CURL * session)
   cJSON * manifest = NULL;
   strcpy(filename, path);
   strcat(filename, "all.json");
-  Http_Download("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json", filename, session);
+  http_download("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json", filename, session);
 
-  parseJsonFile(filename, &manifest);
+  manifest = json_parse_file(filename);
   return manifest;
 }
 
@@ -38,8 +38,8 @@ cJSON * getJreManifest(cJSON * manifest, char * component, char * path, CURL * s
         if (manifest)
         {
           cJSON * url = cJSON_GetObjectItemCaseSensitive(manifest, "url");
-          Http_Download(url->valuestring, path, session);
-          parseJsonFile(path, &jreManifest);
+          http_download(url->valuestring, path, session);
+          jreManifest = json_parse_file(path);
         }
       }
     }
@@ -63,7 +63,7 @@ char * getJreComponent(cJSON * manifest)
   return component;
 }
 
-char * downloadJre(cJSON * manifest, char * path, CURL * session)
+char * MinecraftManifest_download_jre(cJSON * manifest, char * path, CURL * session)
 {
   char * tempPath = malloc((strlen(path) + 6) * sizeof(char *));
   strcpy(tempPath, path);
@@ -104,7 +104,7 @@ char * downloadJre(cJSON * manifest, char * path, CURL * session)
         {
           if (strcmp(type->valuestring, "file") == 0)
           {
-            Http_Download(url->valuestring, fullpath, session);
+            http_download(url->valuestring, fullpath, session);
             if (executable)
             {
                 if (executable->valueint == 1)

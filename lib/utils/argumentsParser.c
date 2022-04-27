@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int _is_boolean(char * option, CMD_ARG *arguments, int dashc)
+int _is_boolean(char * option, CmdArg *arguments, int dashc)
 {
   if (dashc == 1)
   {
@@ -23,7 +23,7 @@ int _is_boolean(char * option, CMD_ARG *arguments, int dashc)
   return 0;
 }
 
-void _put_value(char * option, char * value, CMD_ARG *arguments, int dashc)
+int _put_value(char * option, char * value, CmdArg *arguments, int dashc)
 {
   if (dashc == 1)
   {
@@ -55,12 +55,12 @@ void _put_value(char * option, char * value, CMD_ARG *arguments, int dashc)
       system_error(1, error_stderr);
     }
   }
-  
+  return 0;
 }
 
-CMD_ARG parse_arguments(int argc, char * argv[])
+CmdArg parse_arguments(int argc, char * argv[])
 {
-  CMD_ARG args;
+  CmdArg args;
   char *currentToken = NULL;
   char *currentOption = malloc(sizeof(char *));
   char tmpChr[] = "a";

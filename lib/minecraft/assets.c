@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 
-char * getAssetIndex(cJSON *manifest)
+char * MinecraftManifest_get_asset_index(cJSON *manifest)
 {
 	char *assetIndex = NULL;
 	cJSON *index = cJSON_GetObjectItemCaseSensitive(manifest, "assetIndex");
@@ -22,8 +22,11 @@ char * getAssetIndex(cJSON *manifest)
 	return assetIndex;
 }
 
-cJSON *downloadAssetsManifest(cJSON *manifest, char *path, CURL *session)
+cJSON * download_assets_manifest(cJSON *manifest, char *path, CURL *session)
 {
+	char * indexesPath = malloc((strlen(path) + 9));
+	strcpy(indexesPath, path);
+	strcat(indexesPath, "indexes/");
 	cJSON *i = cJSON_GetObjectItemCaseSensitive(manifest, "assetIndex");
 	cJSON *assetsManifest = NULL;
 	char * fullpath = NULL;
@@ -31,23 +34,26 @@ cJSON *downloadAssetsManifest(cJSON *manifest, char *path, CURL *session)
 	{
 		cJSON *url = cJSON_GetObjectItemCaseSensitive(i, "url");
 		cJSON *index = cJSON_GetObjectItemCaseSensitive(i, "id");
-		fullpath = malloc((strlen(path) + strlen(index->valuestring) + 1) * sizeof(char *));
-		strcpy(fullpath, path);
+		fullpath = malloc((strlen(indexesPath) + strlen(index->valuestring) + 6) * sizeof(char *));
+		strcpy(fullpath, indexesPath);
 		strcat(fullpath, index->valuestring);
-		Http_Download(url->valuestring, fullpath, session);
-		parseJsonFile(fullpath, &assetsManifest);
+		strcat(fullpath, ".json");
+		http_download(url->valuestring, fullpath, session);
+		assetsManifest = json_parse_file(fullpath);
 	}
 
 	return assetsManifest;
 }
 
-int downloadAssets(cJSON *manifest, char * assetsPath, CURL *session)
+int MinecraftManifest_download_assets(cJSON *manifest, char * assetsPath, CURL *session)
 {
 	char ressourceUrl[] = "https://resources.download.minecraft.net/";
+
 	char * path = malloc((strlen(assetsPath) + 8) * sizeof(char *));
 	strcpy(path, assetsPath);
-	path = strcat(path, "objects/");
-	cJSON *assetsManifest = downloadAssetsManifest(manifest, path, session);
+	strcat(path, "objects/");
+
+	cJSON *assetsManifest = download_assets_manifest(manifest, assetsPath, session);
 	cJSON *i = NULL;
 	assetsManifest = cJSON_GetObjectItemCaseSensitive(assetsManifest, "objects");
 	if (assetsManifest)
@@ -70,7 +76,7 @@ int downloadAssets(cJSON *manifest, char * assetsPath, CURL *session)
 			strcat(fullpath, folder);
 			strcat(fullpath, "/");
 			strcat(fullpath, hash->valuestring);
-			Http_Download(url, fullpath, session);
+			http_download(url, fullpath, session);
 		}
 	}
 	return 0;

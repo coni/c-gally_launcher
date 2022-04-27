@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void parseJsonFile(const char *filename, cJSON **json)
+cJSON * json_parse_file(const char *filename)
 { 
 	int c;
 	int index = 0;
@@ -20,6 +20,5 @@ void parseJsonFile(const char *filename, cJSON **json)
 	}
 	fclose(fp);
 
-  *json = cJSON_Parse(content);
-	free(content);
+  return cJSON_Parse(content);
 } 

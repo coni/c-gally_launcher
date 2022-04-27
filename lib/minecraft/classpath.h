@@ -1,5 +1,5 @@
 #include "../cJSON/cJSON.h"
 #include <curl/curl.h>
 
-char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **session);
-char * getLwjglVersion(cJSON *manifest);
+char * MinecraftManifest_download_libraries(cJSON **manifest, const char *path, CURL **session);
+char * MinecraftManifest_get_lwjgl_version(cJSON *manifest);

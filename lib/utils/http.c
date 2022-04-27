@@ -9,7 +9,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
   return written;
 }
 
-int Http_Download(const char * url, const char * filename, CURL **session, int compare)
+int http_download(const char * url, const char * filename, CURL **session, int compare)
 {
   // Source : https://curl.se/libcurl/c/url2file.html
   if(access( filename, F_OK ) == 0)

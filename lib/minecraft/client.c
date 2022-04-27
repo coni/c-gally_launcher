@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char * downloadMainJar(cJSON * manifest, const char * versionName, const char * versionPath, CURL * session)
+char * MinecraftManifest_download_client(cJSON * manifest, const char * versionName, const char * versionPath, CURL * session)
 {
 	
 	char *url= NULL;
@@ -34,7 +34,7 @@ char * downloadMainJar(cJSON * manifest, const char * versionName, const char * 
 		strcat(path, versionName);
 		strcat(path, ".jar");
 
-		Http_Download(url, path, session);
+		http_download(url, path, session);
 	}
 	return path;
 }

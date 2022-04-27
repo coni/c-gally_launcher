@@ -15,16 +15,16 @@ typedef struct {
 	char *version_type;
 	char *resolution_width;
 	char *resolution_height;
-} gameARGS;
+} GameArgs;
 
 typedef struct {
 	char *classpath;
 	char *launcher_name;
 	char *launcher_version;
 	char *natives_directory;
-} jvmARGS;
+} JvmArgs;
 
-char * getGameArguments(cJSON * manifest, gameARGS args);
-char * getJavaArguments(cJSON * manifest, jvmARGS args);
-gameARGS initGameArgs();
-jvmARGS initJvmArgs();
+char * getGameArguments(cJSON * manifest, GameArgs args);
+char * getJavaArguments(cJSON * manifest, JvmArgs args);
+GameArgs MinecraftManifest_initialize_game_arguments();
+JvmArgs MinecraftManifest_initialize_jvm_arguments();

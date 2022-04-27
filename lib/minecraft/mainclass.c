@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *getMainclass(cJSON *manifest)
+char *MinecraftManifest_get_mainclass(cJSON *manifest)
 {
 	char *mainclass = NULL;
 	cJSON *jsonMainclass = cJSON_GetObjectItemCaseSensitive(manifest, "mainClass");

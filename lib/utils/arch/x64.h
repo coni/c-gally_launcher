@@ -1,2 +1,2 @@
-char OSNAME[] = "linux";
-char ARCHITECTURE[] = "x64";
+const char OSNAME[] = "linux";
+const char ARCHITECTURE[] = "x64";

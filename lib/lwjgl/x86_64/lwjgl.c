@@ -16,13 +16,18 @@ cJSON * getBaseLwjglManifest(char * path, CURL * session)
   cJSON * manifest = NULL;
   strcpy(filename, path);
   strcat(filename, "lwjgl.json");
-  Http_Download("https://gally-launcher.com/files/lwjgl.json", filename, session);
-  parseJsonFile(filename, &manifest);
+  http_download("https://gally-launcher.com/files/lwjgl.json", filename, session);
+  manifest = json_parse_file(filename);
   return manifest;
 }
 
-int downloadLwjgl(char * lwjglVersion, char * path, CURL * session)
+char * download_lwjgl(char * lwjglVersion, char * path, CURL * session)
 {
+	char * lwjglPath = malloc((strlen(path) + strlen(lwjglVersion) + 2)*sizeof(char*));
+	strcpy(lwjglPath, path);
+	strcat(lwjglPath, lwjglVersion);
+	strcat(lwjglPath, "/");
+
   cJSON * lwjglManifest = getBaseLwjglManifest(path, session);
   cJSON * i = NULL;
   lwjglManifest = cJSON_GetObjectItemCaseSensitive(lwjglManifest, "lwjgl");
@@ -39,14 +44,14 @@ int downloadLwjgl(char * lwjglVersion, char * path, CURL * session)
         {
           cJSON * url = cJSON_GetObjectItemCaseSensitive(i, "url");
           cJSON * filename = cJSON_GetObjectItemCaseSensitive(i, "filename");
-          char * fullpath = malloc((strlen(path) + strlen(filename->valuestring) + 1) * sizeof(char *));
-          strcpy(fullpath, path);
+          char * fullpath = malloc((strlen(lwjglPath) + strlen(filename->valuestring) + 1) * sizeof(char *));
+          strcpy(fullpath, lwjglPath);
           strcat(fullpath, filename->valuestring);
 
-          Http_Download(url->valuestring, fullpath, session);
+          http_download(url->valuestring, fullpath, session);
         }
       }
     }
   }
-  return 0;
+  return lwjglPath;
 }

@@ -22,63 +22,58 @@
 int main(int argc, char * argv[])
 {
 	// init variable
-	CMD_ARG args = parse_arguments(argc, argv);
+	CmdArg args = parse_arguments(argc, argv);
 	char *version = args.version;
 	char *root = "/home/coni/.minecraft/";
-	char *rootBinary = malloc((strlen(root) + 5)*sizeof(char *));
-	char *rootVersion = malloc((strlen(root) + 10)*sizeof(char*));
-	char *rootAssets = malloc((strlen(root) + 8)*sizeof(char*));
-	char *rootLibraries = malloc((strlen(root) + 10)*sizeof(char*));
+	char rootBinary[(strlen(root) + 5)];
+	char rootVersion[strlen(root) + 10];
+	char rootAssets[strlen(root) + 8];
+	char rootLibraries[strlen(root) + 11];
+	char rootRuntime[strlen(root) + 9];
+	
+	strcpy(rootRuntime, root);
+	strcat(rootRuntime, "runtime/");
 
 	strcpy(rootVersion, root);
-	strcpy(rootAssets, root);
-	strcpy(rootLibraries, root);
-	strcpy(rootBinary, root);
-	strcat(rootBinary, "bin/");
 	strcat(rootVersion, "versions/");
-	strcat(rootAssets, "assets/");
+
+
+	strcpy(rootLibraries, root);
 	strcat(rootLibraries, "libraries/");
 
-	CURL *session = curl_easy_init();
+	strcpy(rootBinary, root);
+	strcat(rootBinary, "bin/");
+
+	strcpy(rootAssets, root);
+	strcat(rootAssets, "assets/");
+
+	CURL *curlSession = curl_easy_init();
   cJSON *versionsManifest = NULL;
 	cJSON *versionManifest = NULL;
-	char *temp = NULL;
 
 	// Version Manifest
-	temp = malloc((strlen(rootVersion) + strlen("version_manifest_v2.json") + 1) * sizeof(char *));
-	strcpy(temp, rootVersion);
-	strcat(temp, "version_manifest_v2.json");
-	printf("Downloading manifest\n");
-	Http_Download("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json", temp, session);
-  parseJsonFile(temp, &versionsManifest);
+	printf("Downloading all versions manifest\n");
+  versionsManifest = MinecraftManifest_get_all_versions_manifest(rootVersion, curlSession);
 
 	// Download version json from the version manifest
-	temp = malloc((strlen(rootVersion) + strlen(version) + strlen(version) + 7) * sizeof(char *));
-	strcpy(temp, rootVersion);
-	strcat(temp, version);
-	strcat(temp, "/");
-	strcat(temp, version);
-	strcat(temp, ".json");
 	printf("Downloading %s manifest\n", version);
-  downloadMinecraftVersion(&versionsManifest, version, temp, session);
-	parseJsonFile(temp, &versionManifest);
+  versionManifest = MinecraftManifest_get_version_manifest(&versionsManifest, version, rootVersion, curlSession);
 
 	// download assets
-	downloadAssets(versionManifest, rootAssets, session);
+	printf("Downloading assets\n");
+	MinecraftManifest_download_assets(versionManifest, rootAssets, curlSession);
 
 	// Getting Classpath from the json version
-	char * lwjglVersion = getLwjglVersion(versionManifest);
-	char * lwjglPath = malloc((strlen(rootBinary) + strlen(lwjglVersion) + 2)*sizeof(char*));
-	strcpy(lwjglPath, rootBinary);
-	strcat(lwjglPath, lwjglVersion);
-	strcat(lwjglPath, "/");
 	printf("Downloading LWJGL\n");
-	downloadLwjgl(lwjglVersion, lwjglPath, session);
+	char * lwjglVersion = MinecraftManifest_get_lwjgl_version(versionManifest);
+	char * lwjglPath = download_lwjgl(lwjglVersion, rootBinary, curlSession);
 
 	printf("Downloading Libraries\n");
-	char *classpath = getClasspath_downloadLibraries(&versionManifest, rootLibraries, session);
+	char *classpath = MinecraftManifest_download_libraries(&versionManifest, rootLibraries, curlSession);
+
 	printf("Downloading Client\n");
-	char *mainJar =	downloadMainJar(versionManifest, version, rootVersion, session);
+	char *mainJar =	MinecraftManifest_download_client(versionManifest, version, rootVersion, curlSession);
+
 	mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
 	strcat(mainJar,":");
 	strcat(mainJar, classpath);
@@ -86,30 +81,30 @@ int main(int argc, char * argv[])
 	classpath = mainJar;
 
 	// Getting Mainclass
-	char *mainclass = getMainclass(versionManifest);
+	char *mainclass = MinecraftManifest_get_mainclass(versionManifest);
 
 	// Get Argument
-	jvmARGS jvmArgs = initJvmArgs();
+	JvmArgs jvmArgs = MinecraftManifest_initialize_jvm_arguments();
 	jvmArgs.classpath = classpath;
 	jvmArgs.natives_directory = lwjglPath;
 
-	gameARGS gameArgs = initGameArgs();
+	GameArgs gameArgs = MinecraftManifest_initialize_game_arguments();
 	gameArgs.version_name = version;
-	gameArgs.assets_index_name = getAssetIndex(versionManifest);
+	gameArgs.assets_index_name = MinecraftManifest_get_asset_index(versionManifest);
 
 	char * gameArguments = getGameArguments(versionManifest, gameArgs);
 	char * javaArguments = getJavaArguments(versionManifest, jvmArgs);
-	char runtimePath[strlen(root) + 8];
-	strcpy(runtimePath, root);
-	strcat(runtimePath, "runtime/");
+
 	printf("Downloading Java Runtime\n");
-	char * javaPath = downloadJre(versionManifest, runtimePath, session);
+	char * javaPath = MinecraftManifest_download_jre(versionManifest, rootRuntime, curlSession);
 	javaPath = realloc(javaPath, (strlen(javaPath) + 10));
-	strcat(javaPath, "bin/java ");
+	strcat(javaPath, "bin/java");
 	
-		// Create Launch Command
-	char * launchCommand = malloc(sizeof(char*) * (strlen(javaPath)  + strlen(javaArguments) + strlen(mainclass) + 1 + strlen(gameArguments) + 1));
+	printf("creating command\n");
+	// Create Launch Command
+	char * launchCommand = malloc(sizeof(char*) * (strlen(javaPath)  + strlen(javaArguments) + strlen(mainclass) + strlen(gameArguments) + 3));
 	strcpy(launchCommand, javaPath);
+	strcat(launchCommand, " ");
 	strcat(launchCommand, javaArguments);
 	strcat(launchCommand, " ");
 	strcat(launchCommand, mainclass);

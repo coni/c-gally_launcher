@@ -1,3 +1,3 @@
 #include "../cJSON/cJSON.h"
 
-char *getMainclass(cJSON *manifest);
+char * MinecraftManifest_get_mainclass(cJSON *manifest);

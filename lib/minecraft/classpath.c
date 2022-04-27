@@ -16,7 +16,7 @@ int compareLwjglVersion(const char * new, const char * old)
 	return 1;
 }
 
-char * getLwjglVersion(cJSON *manifest)
+char * MinecraftManifest_get_lwjgl_version(cJSON *manifest)
 {
 	const cJSON *libraries = cJSON_GetObjectItemCaseSensitive(manifest, "libraries");
 	cJSON * lib = NULL;
@@ -80,7 +80,7 @@ char * getLwjglVersion(cJSON *manifest)
 	return lwjglVersion;
 }
 
-char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **session)
+char * MinecraftManifest_download_libraries(cJSON **manifest, const char *path, CURL **session)
 {
 	char *classpath = malloc(sizeof(char *));
 	strcpy(classpath, "");
@@ -183,7 +183,7 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 					cJSON *libPath = cJSON_GetObjectItemCaseSensitive(libDlInfo, "path");
 					cJSON *libSize = cJSON_GetObjectItemCaseSensitive(libDlInfo, "size");
 					
-					Http_Download(libUrl->valuestring, fullpath, session);
+					http_download(libUrl->valuestring, fullpath, session);
 				}
 			} else
 			{
@@ -193,7 +193,7 @@ char *getClasspath_downloadLibraries(cJSON **manifest, const char *path, CURL **
 					char *libUrl = malloc(sizeof(char *) * (strlen(libDlInfo->valuestring) + strlen(libNameFormatted) + 1));
 					strcpy(libUrl, libDlInfo->valuestring);
 					strcat(libUrl, libNameFormatted);
-					Http_Download(libDlInfo->valuestring, fullpath, session);	
+					http_download(libDlInfo->valuestring, fullpath, session);	
 				}
 			}
 

@@ -5,9 +5,9 @@
 #include <string.h>
 #include "arguments.h"
 
-jvmARGS initJvmArgs()
+JvmArgs MinecraftManifest_initialize_jvm_arguments()
 {
-	jvmARGS args;
+	JvmArgs args;
 	args.classpath = "NULL";
 	args.launcher_name = "gally";
 	args.natives_directory = "NULL";
@@ -15,9 +15,9 @@ jvmARGS initJvmArgs()
 	return args;
 }
 
-gameARGS initGameArgs()
+GameArgs MinecraftManifest_initialize_game_arguments()
 {
-	gameARGS args;
+	GameArgs args;
 	args.auth_player_name = "steve";
 	args.game_directory = "\".\"";
 	args.assets_root = "assets";
@@ -35,7 +35,7 @@ gameARGS initGameArgs()
 	return args;
 }
 
-char * getGameArguments(cJSON * manifest, gameARGS args)
+char * getGameArguments(cJSON * manifest, GameArgs args)
 {
 	char *gameArguments = malloc(sizeof(char*));
 	strcpy(gameArguments,"");
@@ -156,7 +156,7 @@ char * getGameArguments(cJSON * manifest, gameARGS args)
 	return gameArguments;
 }
 
-char * getJavaArguments(cJSON * manifest, jvmARGS args)
+char * getJavaArguments(cJSON * manifest, JvmArgs args)
 {
 	char *javaArguments = malloc(sizeof(char*));
 	strcpy(javaArguments,"");
