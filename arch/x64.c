@@ -1,4 +1,4 @@
-#include "../system.h"
+#include "../lib/utils/system.h"
 #include <string.h>
 
 const char OSNAME[] = "linux";

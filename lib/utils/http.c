@@ -1,18 +1,17 @@
-#include <stddef.h>
 #include <curl/curl.h>
 #include <unistd.h>
-
 #include "system.h"
+
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
   return written;
 }
 
-int http_download(const char * url, const char * filename, CURL **session, int compare)
+int http_download(const char * url, char * filename, CURL **session, int compare)
 {
   // Source : https://curl.se/libcurl/c/url2file.html
-  if(access( filename, F_OK ) == 0)
+  if(system_file_exist(filename) == 0)
     return 1;
   FILE *pagefile;
 	int http_code = 0;

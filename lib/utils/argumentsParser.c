@@ -29,6 +29,8 @@ int _put_value(char * option, char * value, CmdArg *arguments, int dashc)
   {
     if (strcmp(option, "v") == 0)
       arguments->version = value;
+    else if (strcmp(option, "vl") == 0)
+      arguments->version_list = value;
     else if (strcmp(option, "u") == 0)
       arguments->username = value;
     else
@@ -44,6 +46,8 @@ int _put_value(char * option, char * value, CmdArg *arguments, int dashc)
   {
     if (strcmp(option, "version") == 0)
       arguments->version = value;
+    else if (strcmp(option, "version-list") == 0)
+      arguments->version_list = value;
     else if (strcmp(option, "username") == 0)
       arguments->username = value;
     else
@@ -114,7 +118,7 @@ CmdArg parse_arguments(int argc, char * argv[])
           if (i +1 >= argc)
           {
             char error_stderr[18 + strlen(currentOption)];
-            strcpy(error_stderr, "invalid option: ");
+            strcpy(error_stderr, "missing arguments: ");
             strcat(error_stderr, currentOption);
             strcat(error_stderr, "\n");
             system_error(1, error_stderr);
