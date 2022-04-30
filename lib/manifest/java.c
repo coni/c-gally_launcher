@@ -70,6 +70,8 @@ char * MinecraftManifest_download_jre(cJSON * manifest, char * path, CURL * sess
   strcat(tempPath, "temp/");
 
   char * component = get_jre_component(manifest);
+  if (component == NULL)
+    return NULL;
   cJSON * jreBaseManifest = get_base_jre_manifest(path, session);
   cJSON * jreManifest = get_jre_manifest(jreBaseManifest, component, path, session);
   char * javaPath = malloc((strlen(path) + strlen(component)*2 + strlen(OSNAME) + 4) * sizeof(char *));

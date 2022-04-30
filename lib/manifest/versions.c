@@ -14,6 +14,15 @@ cJSON * MinecraftManifest_get_all_versions_manifest(char * path, CURL * session)
   return json_parse_file(fullpath);
 }
 
+char * MinecraftManifest_get_inherit(cJSON * manifest)
+{
+	char * version = NULL;
+	manifest = cJSON_GetObjectItemCaseSensitive(manifest, "inheritsFrom");
+	if (manifest)
+		version = manifest->valuestring;
+	return version;
+}
+
 void MinecraftManifest_list_version(char * versionPath, cJSON *manifest, char * versionType)
 {
 	cJSON * i = NULL;
@@ -46,6 +55,40 @@ void MinecraftManifest_list_version(char * versionPath, cJSON *manifest, char * 
 				printf("%s\n", id->valuestring);
 		}
 	}
+}
+
+
+int MinecraftManifest_version_exist(char * version, char * versionPath, cJSON *manifest)
+{
+	cJSON * i = NULL;
+	manifest = cJSON_GetObjectItemCaseSensitive(manifest, "versions");
+	int arraySize = system_count_files(versionPath, 2);
+	char *listDownloadedVersion[arraySize];
+	system_ls(versionPath, 2, listDownloadedVersion);	
+	for (int i = 0; i < arraySize; i++)
+	{
+		char jsonFile[strlen(versionPath) + strlen(listDownloadedVersion[i]) * 2 + 7];
+		strcpy(jsonFile, versionPath);
+		strcat(jsonFile, listDownloadedVersion[i]);
+		strcat(jsonFile, "/");
+		strcat(jsonFile, listDownloadedVersion[i]);
+		strcat(jsonFile, ".json");
+		if (strcmp(version, listDownloadedVersion[i]) == 0)
+		{
+			if (system_file_exist(jsonFile) == 0)
+				return 0;
+		}
+	}
+
+	for (int j = cJSON_GetArraySize(manifest)-1; j >= 0; j--)
+	{
+		i = cJSON_GetArrayItem(manifest, j);
+		cJSON * type = cJSON_GetObjectItemCaseSensitive(i, "type");	
+		cJSON * id = cJSON_GetObjectItemCaseSensitive(i, "id");	
+		if (strcmp(id->valuestring, version) == 0)
+			return 0;
+	}
+	return 1;
 }
 
 cJSON * MinecraftManifest_get_version_manifest(cJSON **versionManifest, const char * version, char * path, CURL * session)

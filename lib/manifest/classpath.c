@@ -77,6 +77,8 @@ char * MinecraftManifest_get_lwjgl_version(cJSON *manifest)
 	}
 	if (strcmp(lwjglVersion, "2.9.4") == 0)
 		lwjglVersion = "2.9.2";
+	else if (strcmp(lwjglVersion, "0.0.0") == 0)
+		lwjglVersion = NULL;
 	return lwjglVersion;
 }
 
@@ -99,6 +101,7 @@ char * MinecraftManifest_download_libraries(cJSON **manifest, const char *path, 
 		cJSON_ArrayForEach(lib, libraries)
 		{
 			cJSON *libName = cJSON_GetObjectItemCaseSensitive(lib, "name");
+			cJSON *libUrl = cJSON_GetObjectItemCaseSensitive(lib, "url");
 			char splittedLibName[strlen(libName->valuestring)];
 			strcpy(splittedLibName, libName->valuestring);
 			char *splittedLibNameElt = strtok(splittedLibName, ":");
@@ -193,7 +196,7 @@ char * MinecraftManifest_download_libraries(cJSON **manifest, const char *path, 
 					char *libUrl = malloc(sizeof(char *) * (strlen(libDlInfo->valuestring) + strlen(libNameFormatted) + 1));
 					strcpy(libUrl, libDlInfo->valuestring);
 					strcat(libUrl, libNameFormatted);
-					http_download(libDlInfo->valuestring, fullpath, session);	
+					http_download(libUrl, fullpath, session);	
 				}
 			}
 

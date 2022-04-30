@@ -35,6 +35,15 @@ GameArgs MinecraftManifest_initialize_game_arguments()
 	return args;
 }
 
+void remove_spaces(char* s) {
+    char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*s++ = *d++);
+}
+
 char * getGameArguments(cJSON * manifest, GameArgs args)
 {
 	char *gameArguments = malloc(sizeof(char*));
@@ -52,59 +61,60 @@ char * getGameArguments(cJSON * manifest, GameArgs args)
 			{
 				if (i->valuestring)
 				{
+					remove_spaces(i->valuestring);
 					if (strcmp("${auth_player_name}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.auth_player_name)));
 						strcat(gameArguments, args.auth_player_name);
 					}
 					else if (strcmp("${version_name}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.version_name)));
 						strcat(gameArguments, args.version_name);
 					}
 					else if (strcmp("${game_directory}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.game_directory)));
 						strcat(gameArguments, args.game_directory);
 					}
 					else if (strcmp("${assets_root}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.assets_root)));
 						strcat(gameArguments, args.assets_root);
 					}
 					else if (strcmp("${assets_index_name}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.assets_index_name)));
 						strcat(gameArguments, args.assets_index_name);
 					}
 					else if (strcmp("${auth_uuid}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.auth_uuid)));
 						strcat(gameArguments, args.auth_uuid);
 					}
 					else if (strcmp("${auth_access_token}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.auth_access_token)));
 						strcat(gameArguments, args.auth_access_token);
 					}
 					else if (strcmp("${clientid}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.clientid)));
 						strcat(gameArguments, args.clientid);
 					}
 					else if (strcmp("${auth_xuid}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.auth_xuid)));
 						strcat(gameArguments, args.auth_xuid);
 					}
 					else if (strcmp("${user_type}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.user_type)));
 						strcat(gameArguments, args.user_type);
 					}
 					else if (strcmp("${version_type}",i->valuestring) == 0)
 					{
-						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(i->valuestring)));
+						gameArguments = realloc(gameArguments, sizeof(char*)*(strlen(gameArguments)+strlen(args.version_type)));
 						strcat(gameArguments, args.version_type);
 					}
 					else
@@ -123,6 +133,7 @@ char * getGameArguments(cJSON * manifest, GameArgs args)
 		if (cJSON_IsString(gameArgJson))
 		{
 			i = gameArgJson;
+			remove_spaces(i->valuestring);
 			if (strstr(i->valuestring, "${auth_player_name}"))
 				i->valuestring = str_replace(i->valuestring, "${auth_player_name}", args.auth_player_name);
 			if (strstr(i->valuestring, "${user_properties}"))
@@ -174,6 +185,7 @@ char * getJavaArguments(cJSON * manifest, JvmArgs args)
 				char *temp = NULL;
 				if (i->valuestring)
 				{
+					remove_spaces(i->valuestring);
 					if (strstr(i->valuestring, "${natives_directory}"))
 					{
 						temp = str_replace(i->valuestring, "${natives_directory}", args.natives_directory);

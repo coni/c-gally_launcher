@@ -22,3 +22,10 @@ cJSON * json_parse_file(const char *filename)
 
   return cJSON_Parse(content);
 } 
+
+void json_save_file(cJSON * json, char * filename)
+{
+	FILE *file = fopen(filename,"w");
+	fprintf(file, cJSON_Print(json));
+	fclose(file);
+}

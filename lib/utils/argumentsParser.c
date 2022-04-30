@@ -4,6 +4,15 @@
 #include <string.h>
 #include <stdlib.h>
 
+CmdArg _init_arg()
+{
+  CmdArg args;
+  args.assets_ignore = 0;
+  args.username = NULL;
+  args.version = NULL;
+  return args;
+}
+
 int _is_boolean(char * option, CmdArg *arguments, int dashc)
 {
   if (dashc == 1)
@@ -64,7 +73,7 @@ int _put_value(char * option, char * value, CmdArg *arguments, int dashc)
 
 CmdArg parse_arguments(int argc, char * argv[])
 {
-  CmdArg args;
+  CmdArg args = _init_arg();
   char *currentToken = NULL;
   char *currentOption = malloc(sizeof(char *));
   char tmpChr[] = "a";

@@ -19,6 +19,8 @@
 #include "lib/manifest/assets.h"
 #include "lib/manifest/java.h"
 
+#include "lib/profiles/profiles.h"
+
 int main(int argc, char * argv[])
 {
 	// init variable
@@ -31,6 +33,10 @@ int main(int argc, char * argv[])
 	char rootLibraries[strlen(root) + 11];
 	char rootRuntime[strlen(root) + 9];
 	
+	char profilesPath[strlen(root) + 28];
+	strcpy(profilesPath, root);
+	strcat(profilesPath, "launcher_profiles.json");
+
 	strcpy(rootRuntime, root);
 	strcat(rootRuntime, "runtime/");
 	strcpy(rootVersion, root);
@@ -45,61 +51,134 @@ int main(int argc, char * argv[])
 	CURL *curlSession = curl_easy_init();
   cJSON *versionsManifest = NULL;
 	cJSON *versionManifest = NULL;
+	cJSON * profiles = NULL;
 
+	char * lwjglPath = NULL;
+	
+	if (system_file_exist(profilesPath) == 0)
+	{
+		profiles = json_parse_file(profilesPath);
+		if (cJSON_GetObjectItemCaseSensitive(profiles, "profiles") == NULL)
+		{
+			profiles = profiles_initialization();
+			profiles_save(root, profiles);
+		}
+	}
+	else
+	{
+		profiles = profiles_initialization();
+		profiles_save(root, profiles);
+	}
+	
 	// Version Manifest
   versionsManifest = MinecraftManifest_get_all_versions_manifest(rootVersion, curlSession);
-
-	if (args.version_list)
-		MinecraftManifest_list_version(rootVersion, versionsManifest, args.version_list);
-	else if (args.version)
+	
+	if (strcmp(args.version_list, "") != 0)
 	{
+		MinecraftManifest_list_version(rootVersion, versionsManifest, args.version_list);
+	}
+	else if (args.version != NULL)
+	{
+		if (MinecraftManifest_version_exist(args.version, rootVersion, versionsManifest) == 1)
+			system_error(1, "this version does not exist\n");
+
 		char *version = args.version;
-		// Download version json from the version manifest
-		printf("Downloading %s manifest\n", version);
-		versionManifest = MinecraftManifest_get_version_manifest(&versionsManifest, version, rootVersion, curlSession);
+		char *mainclass = NULL;
+		char *inherits = args.version;
+		char *classpath = malloc(sizeof(char*)+1);
+		char * javaPath = NULL;
+		char * gameArguments = NULL;
+		char * javaArguments = malloc(sizeof(char*) * 2);
+		strcpy(javaArguments, "");
 
-		// download assets
-		printf("Downloading assets\n");
-		MinecraftManifest_download_assets(versionManifest, rootAssets, curlSession);
-
-		// Getting Classpath from the json version
-		printf("Downloading LWJGL\n");
-		char * lwjglVersion = MinecraftManifest_get_lwjgl_version(versionManifest);
-		char * lwjglPath = download_lwjgl(lwjglVersion, rootBinary, curlSession);
-
-		printf("Downloading Libraries\n");
-		char *classpath = MinecraftManifest_download_libraries(&versionManifest, rootLibraries, curlSession);
-
-		printf("Downloading Client\n");
-		char *mainJar =	MinecraftManifest_download_client(versionManifest, version, rootVersion, curlSession);
-
-		mainJar = realloc(mainJar, (strlen(classpath) + 1 + strlen(mainJar)) * sizeof(char*));
-		strcat(mainJar,":");
-		strcat(mainJar, classpath);
-		free(classpath);
-		classpath = mainJar;
-
-		// Getting Mainclass
-		char *mainclass = MinecraftManifest_get_mainclass(versionManifest);
-
-		// Get Argument
-		JvmArgs jvmArgs = MinecraftManifest_initialize_jvm_arguments();
-		jvmArgs.classpath = classpath;
-		jvmArgs.natives_directory = lwjglPath;
-
+		strcpy(classpath, "");
+		
 		GameArgs gameArgs = MinecraftManifest_initialize_game_arguments();
-		gameArgs.version_name = version;
-		gameArgs.assets_index_name = MinecraftManifest_get_asset_index(versionManifest);
-		if (args.username)
+		JvmArgs jvmArgs = MinecraftManifest_initialize_jvm_arguments();
+		
+		if (args.username != NULL)
 			gameArgs.auth_player_name = args.username;
+		gameArgs.version_name = version;
+		
+		while (inherits != NULL)
+		{
+			// Download version json from the version manifest
+			printf("Downloading %s manifest\n", inherits);
+			versionManifest = MinecraftManifest_get_version_manifest(&versionsManifest, inherits, rootVersion, curlSession);
 
-		char * gameArguments = getGameArguments(versionManifest, gameArgs);
-		char * javaArguments = getJavaArguments(versionManifest, jvmArgs);
 
-		printf("Downloading Java Runtime\n");
-		char * javaPath = MinecraftManifest_download_jre(versionManifest, rootRuntime, curlSession);
-		javaPath = realloc(javaPath, (strlen(javaPath) + 10));
-		strcat(javaPath, "bin/java");
+			// download assets
+			if (args.assets_ignore == 0)
+			{
+				printf("Downloading assets\n");
+				MinecraftManifest_download_assets(versionManifest, rootAssets, curlSession);
+			}
+
+			// Getting Classpath from the json version
+			printf("Downloading LWJGL\n");
+			char * lwjglVersion = MinecraftManifest_get_lwjgl_version(versionManifest);
+			if (lwjglVersion != NULL)
+			{
+				lwjglPath = download_lwjgl(lwjglVersion, rootBinary, curlSession);
+				jvmArgs.natives_directory = lwjglPath;
+			}
+
+			printf("Downloading Libraries\n");
+			char *libraries = MinecraftManifest_download_libraries(&versionManifest, rootLibraries, curlSession);
+
+			printf("Downloading Client\n");
+			char *mainJar =	MinecraftManifest_download_client(versionManifest, inherits, rootVersion, curlSession);
+
+			if (mainJar)
+			{
+				classpath = realloc(classpath, (strlen(mainJar) + strlen(classpath) + 3));
+				if (strcmp(mainJar, "") != 0)
+				{
+					if (strcmp(classpath, "") == 1)
+						strcat(classpath, ":");
+					strcat(classpath, mainJar);
+					strcat(classpath, ":");
+				}
+			}
+
+			if (libraries)
+			{
+				classpath = realloc(classpath, (strlen(libraries) + strlen(classpath) + 2));
+				if (strcmp(classpath, "") == 1)
+					strcat(classpath, ":");
+				strcat(classpath, libraries);
+			}
+
+			// Getting Mainclass
+			if (strcmp(inherits, version) == 0 || (mainclass == NULL && strcmp(inherits, version) == 1))
+				mainclass = MinecraftManifest_get_mainclass(versionManifest);
+
+			char *t = MinecraftManifest_get_asset_index(versionManifest);
+			if (t)
+				gameArgs.assets_index_name = t;
+
+			printf("Downloading Java Runtime\n");
+			javaPath = MinecraftManifest_download_jre(versionManifest, rootRuntime, curlSession);
+			if (javaPath)
+			{
+					javaPath = realloc(javaPath, (strlen(javaPath) + 10));
+					strcat(javaPath, "bin/java");
+			}
+
+			jvmArgs.classpath = classpath;
+			t = getJavaArguments(versionManifest, jvmArgs);
+			javaArguments = realloc(javaArguments, (strlen(javaArguments) + strlen(t) + 2));
+			if (strcmp(javaArguments, "") == 1)
+				strcat(javaArguments, " ");
+			strcat(javaArguments, t);
+
+			gameArguments = getGameArguments(versionManifest, gameArgs);
+
+			// get inherits 
+			inherits = MinecraftManifest_get_inherit(versionManifest);
+
+		}
+		
 		
 		printf("creating command\n");
 		// Create Launch Command
