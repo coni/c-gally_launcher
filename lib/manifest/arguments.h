@@ -1,6 +1,7 @@
 #include "../cJSON/cJSON.h"
 
 typedef struct {
+	char *version;
 	char *auth_player_name;
 	char *auth_access_token;
 	char *version_name;

@@ -10,6 +10,7 @@ CmdArg _init_arg()
   args.assets_ignore = 0;
   args.username = NULL;
   args.version = NULL;
+  args.version_list = NULL;
   return args;
 }
 

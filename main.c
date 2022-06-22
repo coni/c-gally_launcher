@@ -72,13 +72,16 @@ int main(int argc, char * argv[])
 	
 	// Version Manifest
   versionsManifest = MinecraftManifest_get_all_versions_manifest(rootVersion, curlSession);
+	printf("version : %s\n", args.version);
 	
-	if (strcmp(args.version_list, "") != 0)
+	if (args.version_list != NULL)
 	{
+		printf("non\n");
 		MinecraftManifest_list_version(rootVersion, versionsManifest, args.version_list);
 	}
-	else if (args.version != NULL)
+	else if (strcmp(args.version, "")  != 0)
 	{
+		printf("oui\n");
 		if (MinecraftManifest_version_exist(args.version, rootVersion, versionsManifest) == 1)
 			system_error(1, "this version does not exist\n");
 

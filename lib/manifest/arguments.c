@@ -27,6 +27,7 @@ GameArgs MinecraftManifest_initialize_game_arguments()
 	args.clientid = "NULL";
 	args.auth_xuid = "NULL";
 	args.user_type = "mojang";
+	args.version = "";
 	args.version_name = "NULL";
 	args.version_type = "release";
 	args.resolution_width = "NULL";
